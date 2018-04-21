@@ -1,3 +1,8 @@
+# Màn chơi mẫu
+# 1: Vị trí hợp lệ
+# 0: Vị trí không hợp lệ
+# G: Vị trí block không thể đứng thẳng
+# X: Đích
 level1 = ['1110000000',
           '1111110000',
           '1111111110',
@@ -7,6 +12,12 @@ level1 = ['1110000000',
 
 # Order: [row col][row, col]
 b_input = ((2, 1), (2, 2))
+
+# Các bước có thể di chuyển được:
+# 1: Lên
+# 2: Phải
+# -1: Xuống
+# -2: Trái
 avalMove = [1, 2, -1, -2]
 listMove = []
 
@@ -26,7 +37,7 @@ def block_direction(i_input=((0, 0), (0, 0))):
     else:
         return None
 
-
+#Xử lý input với hướng nhận được
 def move(direction, i_input=((0, 0), (0, 0))):
     row = 0
     col = 0
@@ -58,7 +69,7 @@ def move(direction, i_input=((0, 0), (0, 0))):
         elif row == -1 or col == -1:
             return (i_input[0][0] + row, i_input[0][1] + col), (i_input[1][0] + row * 2, i_input[1][1] + col * 2)
 
-
+# Tính giá trị từ input
 def valid_move(i_input=((0, 0), (0, 0)), i_board=None):
     if i_board is None:
         i_board = []
@@ -72,7 +83,7 @@ def valid_move(i_input=((0, 0), (0, 0)), i_board=None):
             return 'N'
     return 'L'
 
-
+# In bàn cờ
 def print_board(i_board, i_pos=((0, 0), (0, 0))):
     n_board = i_board.copy()
     n_board[i_pos[0][0]] = n_board[i_pos[0][0]][:i_pos[0][1]] + 'B' + n_board[i_pos[0][0]][i_pos[0][1] + 1:]
@@ -80,7 +91,7 @@ def print_board(i_board, i_pos=((0, 0), (0, 0))):
     for board in n_board:
         print(board)
 
-
+# Giải thuật dfs
 def dfs(direction, i_pos=((0, 0), (0, 0)), i_board=None):
     global avalMove
     global listMove
@@ -100,7 +111,7 @@ def dfs(direction, i_pos=((0, 0), (0, 0)), i_board=None):
 def bfs():
     return 0
 
-
+# Phương thứ xử lý giải thuật
 def run(i_method):
     for mv in list(reversed(listMove)):
         print('Block position: ', mv)
