@@ -37,7 +37,7 @@ def block_direction(i_input=((0, 0), (0, 0))):
     else:
         return None
 
-#Xử lý input với hướng nhận được
+# Xử lý input với hướng nhận được
 def move(direction, i_input=((0, 0), (0, 0))):
     row = 0
     col = 0
@@ -75,13 +75,29 @@ def valid_move(i_input=((0, 0), (0, 0)), i_board=None):
         i_board = []
     height = len(i_board)
     width = len(i_board[0])
-    if i_input[0][0] >= 0 and i_input[0][1] >= 0 and i_input[1][0] >= 0 and i_input[1][1] >= 0 and i_input[0][0] < height and i_input[1][0] < height and i_input[0][1] < width and i_input[1][1] < width:
-        if i_board[i_input[0][0]][i_input[0][1]] == 'X' and i_board[i_input[1][0]][i_input[1][1]] == 'X':
-            return 'W'
-        elif (i_board[i_input[0][0]][i_input[0][1]] == '1' and i_board[i_input[1][0]][i_input[1][1]] == '1') \
-                or (block_direction(i_input) != 0 and i_board[i_input[0][0]][i_input[0][1]] == 'G' and i_board[i_input[1][0]][i_input[1][1]] == 'G'):
-            return 'N'
-    return 'L'
+    i_state = ''
+    if is_not_out_of_range(i_input, height, width):
+        if is_equal(i_input, i_board, 'X'):
+            i_state = 'W'
+        elif is_equal(i_input, i_board, '1') or (block_direction(i_input) != 0 and is_equal(i_input, i_board, 'G')):
+            i_state = 'N'
+        else: i_state = 'L'
+    else: i_state =   'L'
+    return i_state, i_board
+
+
+def is_not_out_of_range(i_input, height, width):
+    rs = True
+    for i in i_input:
+        rs = rs and i[0] >= 0 and i[1] >= 0 and i[0] < height and i[1] < width
+    return rs
+
+def is_equal(i_input, i_board, str):
+    rs = True
+    for i in i_input:
+        rs = rs and i_board[i[0]][i[1]] == str
+    return rs
+
 
 # In bàn cờ
 def print_board(i_board, i_pos=((0, 0), (0, 0))):
@@ -98,10 +114,10 @@ def dfs(direction, i_pos=((0, 0), (0, 0)), i_board=None):
     if i_board is None:
         i_board = []
     n_input = move(direction, i_pos)
-    temp = valid_move(n_input, i_board)
+    temp, n_board = valid_move(n_input, i_board)
     if temp == 'N':
         for m in list(filter(lambda x: x != -direction, avalMove)):
-            temp = dfs(m, n_input, i_board)
+            temp = dfs(m, n_input, n_board)
             if temp == 'W':
                 break
     if temp == 'W':
@@ -111,7 +127,7 @@ def dfs(direction, i_pos=((0, 0), (0, 0)), i_board=None):
 def bfs():
     return 0
 
-# Phương thứ xử lý giải thuật
+# Phương thứ chạy giải thuật
 def run(i_method):
     for mv in list(reversed(listMove)):
         print('Block position: ', mv)
