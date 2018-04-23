@@ -185,13 +185,6 @@ def exist(moves_w_board, i_input, i_board):
             return True
     return False
 
-
-def get_list_input(moves_w_board):
-    return [i[0] for i in moves_w_board]
-
-def get_list_board(moves_w_board):
-    return [i[1] for i in moves_w_board]
-
 def dfs(moves_w_board, i_board, state, i_input):
 
     if state == 'L':
