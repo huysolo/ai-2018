@@ -97,7 +97,7 @@ def execute_move(i_input=((0, 0), (0, 0)), i_board=None):
         if is_equal(i_input, i_board, 'X'):
             i_state = 'W'
 
-        # Trường hợp thua
+        # Trường hợp không thay đổi trạng thái
         elif is_equal([i_input[0]], i_board, '0') or is_equal([i_input[1]], i_board, '0') or (block_dir == 0 and is_equal(i_input, i_board, 'G')):
             i_state = 'L'
 
@@ -164,15 +164,16 @@ def get_string(i_block, i_board, pos=0):
 
 # In bàn cờ
 def print_board(i_board, i_pos=((0, 0), (0, 0))):
-    i_board[i_pos[0][0]][i_pos[0][1]] = 'B '
-    i_board[i_pos[1][0]][i_pos[1][1]] =  'B '
-    for board in i_board:
+    n_board = copy.deepcopy(i_board)
+    n_board[i_pos[0][0]][i_pos[0][1]] = 'B '
+    n_board[i_pos[1][0]][i_pos[1][1]] =  'B '
+    for board in n_board:
         for word in board:
           if word[0] == '0':
-            word = '0 '
+            word = '  '
           elif word[0] == '1':
             word = '1 '
-          elif word == 'X':
+          elif word == 'X': 
             word = 'X '
           elif len(word) == 1:
             word = word.ljust(2)
@@ -202,7 +203,7 @@ def dfs(moves_w_board, i_board, state, i_input):
         if exist(moves_w_board, i_input, i_board):
             return None
         else:
-            n_moves_w_board = moves_w_board
+            n_moves_w_board = copy.deepcopy(moves_w_board)
             n_moves_w_board.append((i_input, i_board))
             for d in list_direction:
                 n_state, n_board, n_input = execute_move(move(d, i_input), copy.deepcopy(i_board))
@@ -223,7 +224,7 @@ def test():
     i_input = ((2, 1), (2, 2))
     global level1
     while True:
-        direct = input('Insert your method: ')
+        direct = input('Insert your your direction: ')
         i_input = move(int(direct), i_input)
         state, level1, i_input = execute_move(i_input, level1)
         print_board(level1, i_input)
@@ -246,6 +247,9 @@ def run(i_inputs):
 while True:
     method = input('Insert your method: ')
     if method == 'dfs':
-        run(dfs([], level1.copy(), 'N', b_input))
+        run(dfs([], level1, 'N', b_input))
     elif method == 'bfs':
-        pass
+        print('BFS')
+    else:
+        test()
+
