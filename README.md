@@ -1,4 +1,4 @@
-# ai-2018
+# ai-2018 - BLOXORZ
 AI assignment in 2018
 <h3>Nội dung chương trình: </h3>
 Hiện thực bài toán trong trò chơi Bloxorz bằng 3 giải thuật: dfs, bfs, hill climbing
