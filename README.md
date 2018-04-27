@@ -26,8 +26,10 @@ Nhập vào 1 trong 3 chuỗi ứng với tên của 3 giải thuật để chư
 </ul>
 
 <h3>Cách hoạt động:</h3>
-- Chương trình nhận vào 1 trong 3 input ứng với tên của 3 giải thuật
-- Hàm run sẽ nhận 1 chuỗi có giá trị trả về là list các cặp input và board ứng với giải thuật đã chọn. Sau đó lần lượt in bàn cờ cùng input
+<ul>
+<li>Chương trình nhận vào 1 trong 3 input ứng với tên của 3 giải thuật</li>
+<li>Hàm run sẽ nhận 1 chuỗi có giá trị trả về là list các cặp input và board ứng với giải thuật đã chọn. Sau đó lần lượt in bàn cờ cùng input</li>
+</ul>
 
 <h3>Các phương thức chính:</h3>
 
