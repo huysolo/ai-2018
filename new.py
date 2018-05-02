@@ -5,16 +5,10 @@
 # 3. Output: Steps to go X destination: 1 Up, -1 Down, 2 Right, -2 Left, 5 Space
 
 
-# DFS, BFS in in little good except Teleport case.
-# Teleport Case is under solving. But Soon .Wait the next commit
-# Hill Climbing is next solving after Teleport
-
-
-
-
+# DFS, BFS in in little good include Teleport case.
+# Hill Clibming is under solving. But Soon .Wait the next commit
+#
 import copy
-import Queue
-from collections import deque
 from copy import deepcopy
 
 # 1: Unbreakable Tile
@@ -70,18 +64,27 @@ start.append(((0,0,0),(0,0,1)))
          
 
 class Node:
-    def __init__(self,key = 1,cur =  None, parIdx = 1, thismap = [], thispassed = []):
+    def __init__(self,key = 1,cur =  None, parIdx = 1, thismap = [], thispassed = [], thispart = -1):
         self.key = key
         self.parIdx = parIdx
         self.cur = cur
         self.map = thismap
         self.passed = thispassed
+        self.part = thispart
+class PNode:
+    def __init__(self, cur = None, thispart = -1):
+        self.cur = cur
+        self.part = thispart
 
 def callEvent(cur = ((0,0,0),(0,0,0))) :
+    global mapi
+    global part
+    print (mapi)
+    
     if cur[0] == cur[1]:
         print('2 in 1')
         return -1
-    if cur[0][0] < 0 or cur[0][1] < 0 or cur[1][0] > len(mapi) - 1 or cur[1][1] > len(mapi[0]) - 1:
+    elif cur[0][0] < 0 or cur[0][0] > len(mapi) - 1 or cur[0][1] < 0 or cur[0][1] > len(mapi[0]) - 1 or cur[1][0] < 0 or cur[1][0] > len(mapi) - 1 or cur[1][1] < 0 or cur[1][1] > len(mapi[0]) - 1:
         #print("out of range")
         return -1
     elif mapi[cur[0][0]][cur[0][1]] == '0' or mapi[cur[1][0]][cur[1][1]] == '0' :
@@ -118,7 +121,7 @@ def callEvent(cur = ((0,0,0),(0,0,0))) :
         #print("Soft Tile")
         return -1
 
-def isPassed(cur = ()):
+def isPassed(cur = None):
     global passed
     for ii in passed:
         if ii == cur:
@@ -127,20 +130,27 @@ def isPassed(cur = ()):
 def isBlock(cur = ()):
     if abs((cur[0][0]) - (cur[1][0])) == 1 and abs((cur[0][1] - cur[1][1]) == 0) or abs((cur[0][1] - cur[1][1])) == 1 and abs((cur[0][0] - cur[1][0]))==0 :
         return 1
-def dfs(cur = ((0,0,0),(0,0,0))):
+def reversePart(part = 0):
+    if part == 0:
+        return 1
+    elif part == 1:
+        return 0
+def dfs(cur = ((0,0,0),(0,0,0)), part = -1):
     global bestMoves
-    global part
     global moves
     global passed
     print cur
+    global tele
     if isPassed(cur) == 1:
        
         return -1
-    
-    
     if part > -1 and isBlock(cur) == 1:
         part = -1
-        print('block')
+        if (cur [0][2] - cur[1][2] == 1 or cur [0][0] - cur[1][0] == 1 or cur [0][1] - cur[1][1] == 1):
+           cur = swap(cur)
+    
+    
+    
         
     
     #print('append()', cur)
@@ -149,9 +159,8 @@ def dfs(cur = ((0,0,0),(0,0,0))):
         return flag
     elif flag == 3:
         passed.append(cur)
-        dfs(tele)
+        dfs(tele, 0)
         passed.pop()
-        return 2
     elif flag == 1:
         if len(bestMoves) == 0 or len(moves) < len(bestMoves) :
             bestMoves = list(moves)
@@ -166,12 +175,14 @@ def dfs(cur = ((0,0,0),(0,0,0))):
             
             
             moves.append(i)
+            print('append -1', move(i,cur))
             
             dfs(move(i, cur))
            
             moves.pop()
             
             moves.append(-1*i)
+            print('append - 1', move(-1*i, cur))
 
             dfs(move(-1*i, cur))
             
@@ -185,17 +196,19 @@ def dfs(cur = ((0,0,0),(0,0,0))):
             return -1;
         passed.append(cur)
         for i in range(1,3):
-            print (i)
+            #print (i)
+            print('append', i, move(i,cur, part))
             moves.append(i)
-            dfs(move(i, cur))
+            dfs(move(i, cur, part), part)
             moves.pop()
-            print(-1*i)
+            #print(-1*i)
             moves.append(-1*i)
-            dfs(move(-1*i, cur))
+            print('append', -1*i,move(i,cur, part))
+            dfs(move(-1*i, cur, part), part)
             moves.pop()
-        print(5)
+        #print(5)
         moves.append(5)
-        dfs(move(5,cur))
+        dfs(cur, reversePart(part))
         moves.pop()
         passed.pop()
     #print('passed.pop()')    
@@ -215,6 +228,7 @@ def bfs(cur = ((0,0,0),(0,0,0))):
     global bestMoves
     global mapi
     global passed
+    global tele
     passed = []
     i = -1
       
@@ -226,19 +240,32 @@ def bfs(cur = ((0,0,0),(0,0,0))):
         cur = curNode.cur
         passed = copy.deepcopy(curNode.passed)
         mapi = copy.deepcopy(curNode.map)
+        part = curNode.part
+        curPNode = PNode(cur, part)
         #print('cur = ',cur)
         #print('before map',mapi)
-        if isPassed(cur) == 1:
+        
+        if part > -1 and isBlock(cur) == 1:
+            part = -1
+            if (cur [0][2] - cur[1][2] == 1 or cur [0][0] - cur[1][0] == 1 or cur [0][1] - cur[1][1] == 1):
+               cur = swap(cur)
+        if isPassed(curPNode) == 1:
             
             #print('passed')
             continue
-        passed.append(cur)
+        passed.append(curPNode)
         
         flag = callEvent(cur)
         #print('after map', mapi)
         
         if flag == -1:
             
+            continue
+        elif flag == 3:
+            passed.append(tele)
+            q[i].cur = tele
+            q[i].part = 0
+            i = i - 1
             continue
         elif flag == 1:
             bestMoves.append(curNode.key)
@@ -258,28 +285,14 @@ def bfs(cur = ((0,0,0),(0,0,0))):
                 q.append(Node(-1*ii,move(-1*ii,cur), i,copy.deepcopy(mapi), copy.deepcopy(passed)))
                
         elif part > -1:
-            tmp = cur
-            cur = flag
-            for i in range(1,3):
-                m.append(i)
-                q.append(move(i,cur))
-                moves.pop()
-                moves.append(-1*i)
-                q.append(move(-1*i, cur))
-                moves.pop()
-            if part == 0:
-                part = 1
-            elif part == 1:
-                part = 0
-
-            for i in range(1,3):
-                moves.append(i)
-                q.append(move(i,cur))
-                moves.pop()
-                moves.append(-1*i)
-                q.append(move(-1*i, cur))
-                moves.pop()
-            cur = tmp
+            passed.append(curPNode)
+            for ii in range(1,3):
+                
+                
+                q.append(Node(ii,move(ii,cur, part), i, copy.deepcopy(mapi), copy.deepcopy(passed), part))
+                
+                q.append(Node(-1*ii,move(-1*ii,cur, part), i,copy.deepcopy(mapi), copy.deepcopy(passed), part))
+            q.append(Node(5, cur, i,copy.deepcopy(mapi), copy.deepcopy(passed), reversePart(part)))
 
     bestMoves.reverse()
 
@@ -342,19 +355,13 @@ def swap(cur = ((0,0,0),(0,0,0))):
     
 
 
-def move(key = 1, cur = ((0,0,0),(0,0,0))):
-    global part
+def move(key = 1, cur = ((0,0,0),(0,0,0)), part = -1):
     nex = [[0,0,0],[0,0,0]]
     if part != -1:
         if key == 1 or key == -1:
-            nex[part][1] = key
+            nex[part][0] = key
         elif key == 2 or key == -2:
             nex[part][1] = key/2
-        elif key == 5:
-            if part == 0:
-                part = 1
-            elif part == 1:
-                part = 0
     elif cur[1][2] == 1:
         #print("cur[1][2] == 1")
         nex[1][2] = -1
@@ -393,9 +400,11 @@ def move(key = 1, cur = ((0,0,0),(0,0,0))):
     
     cur = ((cur[0][0] + nex[0][0], cur[0][1] + nex[0][1], cur[0][2] + nex[0][2]), (cur[1][0] + nex[1][0], cur[1][1] + nex[1][1], cur[1][2] + nex[1][2]))
     #print(cur)
-           
+   
+          
     if part == -1 and (cur [0][2] - cur[1][2] == 1 or cur [0][0] - cur[1][0] == 1 or cur [0][1] - cur[1][1] == 1):
            cur = swap(cur)
+    
     #print(cur)
 
     return cur
