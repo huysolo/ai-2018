@@ -79,7 +79,7 @@ class PNode:
 def callEvent(cur = ((0,0,0),(0,0,0))) :
     global mapi
     global part
-    print (mapi)
+    #print (mapi)
     
     if cur[0] == cur[1]:
         print('2 in 1')
@@ -87,37 +87,37 @@ def callEvent(cur = ((0,0,0),(0,0,0))) :
     elif cur[0][0] < 0 or cur[0][0] > len(mapi) - 1 or cur[0][1] < 0 or cur[0][1] > len(mapi[0]) - 1 or cur[1][0] < 0 or cur[1][0] > len(mapi) - 1 or cur[1][1] < 0 or cur[1][1] > len(mapi[0]) - 1:
         #print("out of range")
         return -1
-    elif mapi[cur[0][0]][cur[0][1]] == '0' or mapi[cur[1][0]][cur[1][1]] == '0' :
+    elif mapi[int(cur[0][0])][int(cur[0][1])] == '0' or mapi[int(cur[1][0])][int(cur[1][1])] == '0' :
         #print("Rot")
         return -1
-    elif mapi[cur[0][0]][cur[0][1]] == 'RB0' or mapi[cur[1][0]][cur[1][1]] == 'RB0' or mapi[cur[0][0]][cur[0][1]] == 'UB' or mapi[cur[1][0]][cur[1][1]] == 'UB':
+    elif mapi[int(cur[0][0])][int(cur[0][1])] == 'RB0' or mapi[int(cur[1][0])][int(cur[1][1])] == 'RB0' or mapi[int(cur[0][0])][int(cur[0][1])] == 'UB' or mapi[int(cur[1][0])][int(cur[1][1])] == 'UB':
         #print("Next Bridge")
         return -1
-    elif mapi[cur[0][0]][cur[0][1]] == 'X' and cur[1][2] == 1:
+    elif mapi[int(cur[0][0])][int(cur[0][1])] == 'X' and cur[1][2] == 1:
         #print("Win")
         return 1
-    elif mapi[cur[0][0]][cur[0][1]][0] == 'L' :
+    elif mapi[int(cur[0][0])][int(cur[0][1])][0] == 'L' :
         #print("Light Bridge")
 
-        inf = mapi[cur[0][0]][cur[0][1]].split(',')
+        inf = mapi[int(cur[0][0])][int(cur[0][1])].split(',')
         for i in range(0,(len(inf)-1)/2):
             switch(int(inf[2*i+1]), int(inf[2*i+2]))
-    elif mapi[cur[1][0]][cur[1][1]][0] == 'L':
+    elif mapi[int(cur[1][0])][int(cur[1][1])][0] == 'L':
         #print("Light Bridge")
-        inf = mapi[cur[1][0]][cur[1][1]].split(',')
+        inf = mapi[int(cur[1][0])][int(cur[1][1])].split(',')
         for i in range(0,(len(inf)-1)/2):
             switch(int(inf[2*i+1]), int(inf[2*i+2]))
-    elif mapi[cur[0][0]][cur[0][1]][0] == 'H' and cur[1][2] == 1:
+    elif mapi[int(cur[0][0])][int(cur[0][1])][0] == 'H' and cur[1][2] == 1:
         #print("Height Bridge")
-        inf = mapi[cur[0][0]][cur[0][1]].split(',')
+        inf = mapi[int(cur[0][0])][int(cur[0][1])].split(',')
         for i in range(0,(len(inf)-1)/2):
             switch(int(inf[2*i+1]), int(inf[2*i+2]))
-    elif mapi[cur[0][0]][cur[0][1]][0] == 'T' and cur[1][2] == 1:
+    elif mapi[int(cur[0][0])][int(cur[0][1])][0] == 'T' and cur[1][2] == 1:
         print("Teleport")
-        inf = mapi[cur[0][0]][cur[0][1]].split(',')
+        inf = mapi[int(cur[0][0])][int(cur[0][1])].split(',')
         teleport(int(inf[1]), int(inf[2]), int(inf[3]), int(inf[4]))
         return 3
-    elif mapi[cur[0][0]][cur[0][1]] == '2' and cur[1][2] == 1:
+    elif mapi[int(cur[0][0])][int(cur[0][1])] == '2' and cur[1][2] == 1:
         #print("Soft Tile")
         return -1
 
@@ -139,7 +139,7 @@ def dfs(cur = ((0,0,0),(0,0,0)), part = -1):
     global bestMoves
     global moves
     global passed
-    print cur
+    #print(cur)
     global tele
     if isPassed(cur) == 1:
        
@@ -163,7 +163,7 @@ def dfs(cur = ((0,0,0),(0,0,0)), part = -1):
         passed.pop()
     elif flag == 1:
         if len(bestMoves) == 0 or len(moves) < len(bestMoves) :
-            bestMoves = list(moves)
+            bestMoves = copy.deepcopy(moves)
         return 1
     elif part == -1:
         if len(bestMoves) != 0 and len(moves) >= len(bestMoves) :
@@ -247,8 +247,10 @@ def bfs(cur = ((0,0,0),(0,0,0))):
         
         if part > -1 and isBlock(cur) == 1:
             part = -1
+            curNode.part = part
             if (cur [0][2] - cur[1][2] == 1 or cur [0][0] - cur[1][0] == 1 or cur [0][1] - cur[1][1] == 1):
                cur = swap(cur)
+               curNode.cur = cur
         if isPassed(curPNode) == 1:
             
             #print('passed')
@@ -424,7 +426,7 @@ def teleport(y0 = 0, x0 = 0, y1 = 0, x1 = 0) :
     global tele
     global part
     tele = ((y0, x0, 0),(y1, x1, 0))
-    print(tele)
+    #print(tele)
     part = 0
     
 
@@ -432,34 +434,35 @@ def teleport(y0 = 0, x0 = 0, y1 = 0, x1 = 0) :
 
 
 
-def unCallEvent(cur = ((0,0,0),(0,0,0))):
-    if mapi[cur[0][0]][cur[0][1]][0] == 'L':
-        inf = mapi[cur[0][0]][cur[0][1]].split(',')
+def unCallEvent(cur = ((int(0),int(0),int(0)),(int(0),int(0),int(0)))):
+    if mapi[int(cur[0][0])][int(cur[0][1])][0] == 'L':
+        inf = mapi[int(cur[0][0])][int(cur[0][1])].split(',')
         for i in range(0,(len(inf)-1)/2):
             switch(int(inf[2*i+1]), int(inf[2*i+2]))
-    elif mapi[cur[1][0]][cur[1][1]][0] == 'L':
-        inf = mapi[cur[1][0]][cur[1][1]].split(',')
+    elif mapi[int(cur[1][0])][int(cur[1][1])][0] == 'L':
+        inf = mapi[int(cur[1][0])][int(cur[1][1])].split(',')
         for i in range(0,(len(inf)-1)/2):
             switch(int(inf[2*i+1]), int(inf[2*i+2]))
-    elif mapi[cur[0][0]][cur[0][1]][0] == 'H' and cur[1][2] == 1:
-        inf = mapi[cur[0][0]][cur[0][1]].split(',')
+    elif mapi[int(cur[0][0])][int(cur[0][1])][0] == 'H' and cur[1][2] == 1:
+        inf = mapi[int(cur[0][0])][int(cur[0][1])].split(',')
         for i in range(0,(len(inf)-1)/2):
             switch(int(inf[2*i+1]), int(inf[2*i+2]))
 def printMoves():
-    for i in bestMoves:
-        print(i, '->')
+    print(bestMoves)
 
-level = input('Level = ')
+level = int(input('Level = '))
 
 mapi = copy.deepcopy(maps[level - 1])
-algo = input('Algorithm: \n1. DFS\n2. BFS\n3. Hill Climbing\nAlgorithm = ')
+algo = int(input('Algorithm: \n1. DFS\n2. BFS\n3. Hill Climbing\nAlgorithm = '))
 if algo == 1:
-    dfs(start[level - 1])
+    dfs(start[level - 1], -1)
 elif algo == 2:
     bfs(start[level - 1])
 else:
     simpleHC(start[level - 1])
 printMoves()
+#print(moves)
+#print(len(bestMoves))
 
 
 #['1','1','1','0','0','0','0','0','0','0']
